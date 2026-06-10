@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script{
                     env.IMAGE_PATH = "${env.DOCKERHUB_CREDENTIALS_USR}/${params.REPO_NAME}:${params.IMAGE_TAG}"
-                    sh "echo Building the image..."
+                    bat "echo Building the image..."
                     dockerImage = docker.build("${env.IMAGE_PATH}")
                 }
             }
@@ -37,7 +37,7 @@ pipeline {
 
         stage('Security Scan (Trivy)') {
             steps {
-                sh """
+                bat """
                     trivy image \
                       --exit-code 1 \
                       --severity HIGH,CRITICAL \
@@ -52,8 +52,8 @@ pipeline {
                     docker.withRegistry('https://index.docker.io/v1', 'docker-hub-credentials'){
                         dockerImage.push("${env.IMAGE_PATH}")
                     }
-                    sh "echo Successfully logged to dockerhub repository"
-                    sh "echo Image pushed successfully to repository"
+                    bat "echo Successfully logged to dockerhub repository"
+                    bat "echo Image pushed successfully to repository"
                 }
             }
         }
