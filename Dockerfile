@@ -4,11 +4,10 @@
 # Use a specific, slim version of the official image
 FROM node:20-alpine AS builder
 
-# Set the working directory inside the container
 WORKDIR /app
 
 # Copy ONLY the dependency files first to leverage Docker layer caching
-COPY package.json package-lock.json ./
+COPY sample-nodejs-main/package.json sample-nodejs-main/package-lock.json ./
 
 # Install all dependencies (including devDependencies needed for building)
 RUN npm ci
