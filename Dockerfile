@@ -39,7 +39,7 @@ COPY sample-nodejs-main/package.json ./
 COPY sample-nodejs-main/app.js ./
 
 # Expose the port your app listens on (matches the containerPort in your Helm chart)
-EXPOSE 8080
+EXPOSE 8081
 
 # Define the command to start your application
 CMD ["node", "app.js"]
