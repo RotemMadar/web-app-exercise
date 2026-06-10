@@ -28,9 +28,10 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script{
-                    withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')])
+                    withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]){
+                        env.IMAGE_PATH = "${DOCKER_USER}/${params.REPO_NAME}:${params.IMAGE_TAG}"
+                    }
                     sh "echo Successfully logged to dockerhub repository"
-                    env.IMAGE_PATH = "${DOCKER_USER}/${params.REPO_NAME}:${params.IMAGE_TAG}"
                     sh "echo Building the image..."
                     dockerImage = docker.build("${env.IMAGE_PATH}")
                 }
