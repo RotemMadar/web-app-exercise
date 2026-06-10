@@ -2,18 +2,13 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'IMAGE_NAME', defaultValue: 'nodejs-app')
         string(name: 'IMAGE_TAG', defaultValue: "${BUILD_NUMBER}")
-
-        string(name: 'ARTIFACTORY_URL')
-        string(name: 'ARTIFACTORY_REPO')
-
-        string(name: 'ENVIRONMENT', defaultValue: 'dev')
+        string(name: 'REPO_NAME')
     }
 
     environment {
-        IMAGE_FULL = "${params.ARTIFACTORY_URL}/${params.ARTIFACTORY_REPO}/${params.IMAGE_NAME}:${params.IMAGE_TAG}"
-        ARTIFACTORY_CRED_ID = "artifactory-creds"
+        DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials') //Taken from credentials configured in Jenkins
+        IMAGE_PATH = ""
     }
 
     stages {
@@ -30,11 +25,15 @@ pipeline {
             }
         }
 
-        stage('Build Image') {
+        stage('Build Docker Image') {
             steps {
-                sh """
-                    docker build -t ${IMAGE_FULL} .
-                """
+                script{
+                    withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')])
+                    sh "echo Successfully logged to dockerhub repository"
+                    env.IMAGE_PATH = "${DOCKER_USER}/${params.REPO_NAME}:${params.IMAGE_TAG}"
+                    sh "echo Building the image..."
+                    dockerImage = docker.build("${env.IMAGE_PATH}")
+                }
             }
         }
 
@@ -44,39 +43,20 @@ pipeline {
                     trivy image \
                       --exit-code 1 \
                       --severity HIGH,CRITICAL \
-                      ${IMAGE_FULL}
+                      ${env.IMAGE_PATH}
                 """
             }
         }
 
         stage('Upload Image to Artifactory') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: "${ARTIFACTORY_CRED_ID}",
-                    usernameVariable: 'USERNAME',
-                    passwordVariable: 'PASSWORD'
-                )]) {
-                    sh """
-                        echo $PASS | docker login ${ARTIFACTORY_URL} -u $USER --password-stdin
-                        docker push ${IMAGE_FULL}
-                        docker logout ${ARTIFACTORY_URL}
-                    """
+                script{
+                    docker.withRegistry('https://index.docker.io/v1', 'docker-hub-credentials'){
+                        dockerImage.push("${env.IMAGE_PATH}")
+                    }
+                    sh "echo Image pushed successfully to repository"
                 }
             }
-        }
-    }
-
-    post {
-        always {
-            sh "docker image prune -f || true"
-        }
-
-        success {
-            echo "Build successful for environment: ${params.ENVIRONMENT}"
-        }
-
-        failure {
-            echo "Build failed for environment: ${params.ENVIRONMENT}"
         }
     }
 }
