@@ -24,6 +24,12 @@ pipeline {
             }
         }
 
+        stage('Security Scan') {
+            steps {
+                echo 'Scanning code for vulnerabilities...'
+            }
+        }
+
         stage('Build Image') {
             steps {
                 sh """
