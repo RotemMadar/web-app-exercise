@@ -15,9 +15,6 @@ RUN npm ci
 # Copy the rest of your application code
 COPY . .
 
-# Build the application (if applicable, e.g., TypeScript to JS, or React/Angular)
-RUN npm run build
-
 # ==========================================
 # Stage 2: Production Environment
 # ==========================================
@@ -36,13 +33,13 @@ USER node
 
 # Copy ONLY the production-ready artifacts from the 'builder' stage
 # This leaves behind all the heavy build tools and source code
-COPY --from=builder --chown=node:node /app/package.json ./
 COPY --from=builder --chown=node:node /app/node_modules ./node_modules
-COPY --from=builder --chown=node:node /app/dist ./dist 
-# Note: Adjust './dist' to wherever your compiled/runnable code lives
+
+COPY package.json ./
+COPY app.js ./
 
 # Expose the port your app listens on (matches the containerPort in your Helm chart)
 EXPOSE 8080
 
 # Define the command to start your application
-CMD ["node", "dist/index.js"]
+CMD ["node", "app.js"]
