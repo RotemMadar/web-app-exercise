@@ -57,5 +57,21 @@ pipeline {
                 }
             }
         }
+
+        stage('Update Helm Values in Git') {
+            steps {
+                script {
+                    powershell """
+                        (Get-Content ./my-webapp/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/values.yaml
+                    """  
+                    powershell """
+                        (Get-Content ./my-webapp/Chart.yaml) -replace 'appVersion: ".*"', 'appVersion: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/Chart.yaml
+                    """                  
+                    bat "git add ."
+                    bat "git commit -m 'ci: update image tag in helm chart to ${params.IMAGE_TAG}'"                    
+                    bat "git push origin main"
+                }
+            }
+        }
     }
 }

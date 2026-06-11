@@ -1,9 +1,11 @@
 replicaCount: 2
 
+appPort: 8080
+
 image:
-  repository: my-registry/my-web-app
+  repository: rotemmadar/nodejs-web-app
   pullPolicy: IfNotPresent
-  tag: "1.0.0" # Usually overridden during CI/CD pipeline execution
+  tag: "1.0.0"
 
 service:
   type: ClusterIP
