@@ -3,7 +3,8 @@ pipeline {
 
     parameters {
         string(name: 'IMAGE_TAG', defaultValue: "${BUILD_NUMBER}")
-        string(name: 'REPO_NAME')
+        string(name: 'APP_REPO_NAME', defaultValue: "https://github.com/RotemMadar/web-app-exercise.git")
+        string(name: 'GITOPS_REPO_NAME', defaultValue: "https://github.com/RotemMadar/web-app-GitOps.git")
     }
 
     environment {
@@ -28,7 +29,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script{
-                    env.IMAGE_PATH = "${env.DOCKERHUB_CREDENTIALS_USR}/${params.REPO_NAME}:${params.IMAGE_TAG}"
+                    env.IMAGE_PATH = "${env.DOCKERHUB_CREDENTIALS_USR}/${params.APP_REPO_NAME}:${params.IMAGE_TAG}"
                     bat "echo Building the image..."
                     dockerImage = docker.build("${env.IMAGE_PATH}")
                 }
@@ -61,6 +62,10 @@ pipeline {
         stage('Update Helm Values in Git') {
             steps {
                 script {
+                    powershell """
+                        git clone "${params.GITOPS_REPO_NAME}"
+                        cd web-app-GitOps
+                    """
                     powershell """
                         (Get-Content ./my-webapp/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/values.yaml
                     """  
