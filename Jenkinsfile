@@ -62,22 +62,21 @@ pipeline {
         stage('Update Helm Values in Git') {
             steps {
                 script {
+                    bat 'if exist web-app-GitOps rmdir /s /q web-app-GitOps'
                     powershell """
-                        dir('web-app-GitOps') {
-                            deleteDir()
-                        }
                         git clone "${params.GITOPS_REPO_NAME}"
-                        cd web-app-GitOps
                     """
-                    powershell """
-                        (Get-Content ./web-app/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/values.yaml
-                    """  
-                    powershell """
-                        (Get-Content ./web-app/Chart.yaml) -replace 'appVersion: ".*"', 'appVersion: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/Chart.yaml
-                    """                  
-                    bat "git add ."
-                    bat "git commit -m \"ci: update image tag in helm chart to ${params.IMAGE_TAG}\""        
-                    bat "git push origin main"
+                    dir('web-app-GitOps') {
+                        powershell """
+                            (Get-Content ./web-app/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/values.yaml
+                        """  
+                        powershell """
+                            (Get-Content ./web-app/Chart.yaml) -replace 'appVersion: ".*"', 'appVersion: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/Chart.yaml
+                        """                  
+                        bat "git add ."
+                        bat "git commit -m \"ci: update image tag in helm chart to ${params.IMAGE_TAG}\""        
+                        bat "git push origin main"
+                    }
                 }
             }
         }
