@@ -73,7 +73,7 @@ pipeline {
                         (Get-Content ./web-app/Chart.yaml) -replace 'appVersion: ".*"', 'appVersion: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/Chart.yaml
                     """                  
                     bat "git add ."
-                    bat "git commit -m 'ci: update image tag in helm chart to ${params.IMAGE_TAG}'"                    
+                    bat "git commit -m "ci: update image tag in helm chart to ${params.IMAGE_TAG}""                    
                     bat "git push origin main"
                 }
             }
