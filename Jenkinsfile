@@ -3,7 +3,7 @@ pipeline {
 
     parameters {
         string(name: 'IMAGE_TAG', defaultValue: "${BUILD_NUMBER}")
-        string(name: 'APP_NAME', defaultValue: "web-app-exercise")
+        string(name: 'APP_NAME', defaultValue: "nodejs-web-app")
         string(name: 'GITOPS_REPO_NAME', defaultValue: "https://github.com/RotemMadar/web-app-GitOps.git")
     }
 
