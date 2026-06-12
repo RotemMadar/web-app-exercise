@@ -9,6 +9,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials') //Taken from credentials configured in Jenkins
+        GITOPSREPO_CREDENTIALS = credentials('gitops-repo-credentials')
         IMAGE_PATH = "${env.DOCKERHUB_CREDENTIALS_USR}/${params.APP_NAME}:${params.IMAGE_TAG}"
     }
 
@@ -67,6 +68,8 @@ pipeline {
                         git clone "${params.GITOPS_REPO_NAME}"
                     """
                     dir('web-app-GitOps') {
+                        bat 'git config user.email ${env.GITOPSREPO_CREDENTIALS_USR}'
+                        bat 'git config user.name ${env.GITOPSREPO_CREDENTIALS_USR}'
                         powershell """
                             (Get-Content ./web-app/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/values.yaml
                         """  
