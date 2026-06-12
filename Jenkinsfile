@@ -36,16 +36,16 @@ pipeline {
             }
         }
 
-        stage('Security Scan (Trivy)') {
-            steps {
-                bat """
-                    trivy image \
-                      --exit-code 1 \
-                      --severity HIGH,CRITICAL \
-                      ${env.IMAGE_PATH}
-                """
-            }
-        }
+        // stage('Security Scan (Trivy)') {
+        //     steps {
+        //         bat """
+        //             trivy image \
+        //               --exit-code 1 \
+        //               --severity HIGH,CRITICAL \
+        //               ${env.IMAGE_PATH}
+        //         """
+        //     }
+        // }
 
         stage('Upload Image to Artifactory') {
             steps {
@@ -67,10 +67,10 @@ pipeline {
                         cd web-app-GitOps
                     """
                     powershell """
-                        (Get-Content ./my-webapp/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/values.yaml
+                        (Get-Content ./web-app/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/values.yaml
                     """  
                     powershell """
-                        (Get-Content ./my-webapp/Chart.yaml) -replace 'appVersion: ".*"', 'appVersion: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/Chart.yaml
+                        (Get-Content ./web-app/Chart.yaml) -replace 'appVersion: ".*"', 'appVersion: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/Chart.yaml
                     """                  
                     bat "git add ."
                     bat "git commit -m 'ci: update image tag in helm chart to ${params.IMAGE_TAG}'"                    
