@@ -4,6 +4,7 @@ pipeline {
     parameters {
         string(name: 'IMAGE_TAG', defaultValue: "${BUILD_NUMBER}")
         string(name: 'APP_NAME', defaultValue: "nodejs-web-app")
+        string(name: 'GIT_MAIL', defaultValue: "rotemmadar9@gmail.com")
         string(name: 'GITOPS_REPO_NAME', defaultValue: "https://github.com/RotemMadar/web-app-GitOps.git")
     }
 
@@ -68,8 +69,8 @@ pipeline {
                         git clone "${params.GITOPS_REPO_NAME}"
                     """
                     dir('web-app-GitOps') {
-                        bat "git config user.email ${env.GITOPSREPO_CREDENTIALS_USR}"
-                        bat "git config user.name ${env.GITOPSREPO_CREDENTIALS_PSW}"
+                        bat "git config user.email ${params.GIT_MAIL}"
+                        bat "git config user.name ${env.GITOPSREPO_CREDENTIALS_USR}"
                         powershell """
                             (Get-Content ./web-app/values.yaml) -replace 'tag:.*', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./web-app/values.yaml
                         """  
@@ -77,7 +78,8 @@ pipeline {
                             (Get-Content ./web-app/Chart.yaml) -replace 'appVersion:.*', 'appVersion: "${params.IMAGE_TAG}"' | Set-Content ./web-app/Chart.yaml
                         """                  
                         bat "git add ."
-                        bat "git commit -m \"ci: update image tag in helm chart to ${params.IMAGE_TAG}\""        
+                        bat "git commit -m \"ci: update image tag in helm chart to ${params.IMAGE_TAG}\""
+                        bat 'git push https://%GITOPSREPO_CREDENTIALS_USR%:%GITOPSREPO_CREDENTIALS_PSW%@github.com/RotemMadar/web-app-GitOps.git main'
                         bat "git push origin main"
                     }
                 }
