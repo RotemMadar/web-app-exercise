@@ -3,13 +3,13 @@ pipeline {
 
     parameters {
         string(name: 'IMAGE_TAG', defaultValue: "${BUILD_NUMBER}")
-        string(name: 'APP_REPO_NAME', defaultValue: "https://github.com/RotemMadar/web-app-exercise.git")
+        string(name: 'APP_NAME', defaultValue: "web-app-exercise")
         string(name: 'GITOPS_REPO_NAME', defaultValue: "https://github.com/RotemMadar/web-app-GitOps.git")
     }
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials') //Taken from credentials configured in Jenkins
-        IMAGE_PATH = ""
+        IMAGE_PATH = "${env.DOCKERHUB_CREDENTIALS_USR}/${params.APP_NAME}:${params.IMAGE_TAG}"
     }
 
     stages {
@@ -29,8 +29,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script{
-                    env.IMAGE_PATH = "${env.DOCKERHUB_CREDENTIALS_USR}/${params.APP_REPO_NAME}:${params.IMAGE_TAG}"
-                    bat "echo Building the image..."
+                    bat "echo Building the image: ${env.IMAGE_PATH}"
                     dockerImage = docker.build("${env.IMAGE_PATH}")
                 }
             }
@@ -51,7 +50,7 @@ pipeline {
             steps {
                 script{
                     docker.withRegistry('https://index.docker.io/v1', 'docker-hub-credentials'){
-                        dockerImage.push("${env.IMAGE_PATH}")
+                        docker.image("${env.IMAGE_PATH}").push()
                     }
                     bat "echo Successfully logged to dockerhub repository"
                     bat "echo Image pushed successfully to repository"
