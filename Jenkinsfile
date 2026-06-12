@@ -69,7 +69,7 @@ pipeline {
                     """
                     dir('web-app-GitOps') {
                         bat 'git config user.email ${env.GITOPSREPO_CREDENTIALS_USR}'
-                        bat 'git config user.name ${env.GITOPSREPO_CREDENTIALS_USR}'
+                        bat 'git config user.name ${env.GITOPSREPO_CREDENTIALS_PSW}'
                         powershell """
                             (Get-Content ./web-app/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/values.yaml
                         """  
