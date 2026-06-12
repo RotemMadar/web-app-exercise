@@ -63,6 +63,9 @@ pipeline {
             steps {
                 script {
                     powershell """
+                        if (Test-Path "web-app-GitOps") {
+                            Remove-Item -Recurse -Force "web-app-GitOps"
+                        }
                         git clone "${params.GITOPS_REPO_NAME}"
                         cd web-app-GitOps
                     """
