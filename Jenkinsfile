@@ -71,10 +71,10 @@ pipeline {
                         bat 'git config user.email ${env.GITOPSREPO_CREDENTIALS_USR}'
                         bat 'git config user.name ${env.GITOPSREPO_CREDENTIALS_PSW}'
                         powershell """
-                            (Get-Content ./web-app/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/values.yaml
+                            (Get-Content ./web-app/values.yaml) -replace 'tag: ".*"', 'tag: "${params.IMAGE_TAG}"' | Set-Content ./web-app/values.yaml
                         """  
                         powershell """
-                            (Get-Content ./web-app/Chart.yaml) -replace 'appVersion: ".*"', 'appVersion: "${params.IMAGE_TAG}"' | Set-Content ./my-webapp/Chart.yaml
+                            (Get-Content ./web-app/Chart.yaml) -replace 'appVersion: ".*"', 'appVersion: "${params.IMAGE_TAG}"' | Set-Content ./web-app/Chart.yaml
                         """                  
                         bat "git add ."
                         bat "git commit -m \"ci: update image tag in helm chart to ${params.IMAGE_TAG}\""        
