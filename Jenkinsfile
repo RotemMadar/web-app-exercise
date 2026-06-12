@@ -49,11 +49,10 @@ pipeline {
         stage('Upload Image to Artifactory') {
             steps {
                 script{
-                    docker.withRegistry('https://index.docker.io/v1', 'docker-hub-credentials'){
+                    docker.withRegistry('', 'docker-hub-credentials'){
                         docker.image("${env.IMAGE_PATH}").push()
                     }
-                    bat "echo Successfully logged to dockerhub repository"
-                    bat "echo Image pushed successfully to repository"
+                    bat "echo Image pushed successfully to Dockerhub"
                 }
             }
         }
