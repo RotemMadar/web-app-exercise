@@ -6,8 +6,6 @@ WORKDIR /app
 COPY sample-nodejs-main/package.json sample-nodejs-main/package-lock.json ./
 
 # To update npm packages and prevent Trivy to find vulnerabilities
-RUN npm install -g npm@latest 
-
 RUN npm ci
 
 COPY . .
@@ -18,6 +16,10 @@ FROM node:21-alpine AS runner
 ARG PORT=8083
 
 WORKDIR /app
+
+RUN apk update && apk upgrade --no-cache
+
+RUN npm install -g npm@latest
 
 # Create a non-root user for security (Alpine Linux comes with a 'node' user)
 RUN chown -R node:node /app
