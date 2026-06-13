@@ -12,8 +12,6 @@ COPY . .
 # Stage 2: Production Environment
 FROM node:22-alpine AS runner
 
-ARG PORT=8083
-
 WORKDIR /app
 
 # To update packages and prevent vulnerabilities
@@ -31,6 +29,6 @@ COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 COPY sample-nodejs-main/package.json ./
 COPY sample-nodejs-main/app.js ./
 
-EXPOSE $PORT
+EXPOSE 8080
 
 CMD ["node", "app.js"]

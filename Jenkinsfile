@@ -87,7 +87,6 @@ pipeline {
                         bat "git add ."
                         bat "git commit -m \"ci: update image tag in helm chart to ${params.IMAGE_TAG}\""
                         bat 'git push https://%GITOPSREPO_CREDENTIALS_USR%:%GITOPSREPO_CREDENTIALS_PSW%@github.com/RotemMadar/web-app-GitOps.git main'
-                        bat "git push origin main"
                     }
                 }
             }
