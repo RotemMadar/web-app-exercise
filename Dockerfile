@@ -2,7 +2,7 @@
 # Stage 1: Build Environment
 # ==========================================
 # Use a specific, slim version of the official image
-FROM node:20-alpine AS builder
+FROM node:21-alpine AS builder
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ COPY . .
 # Stage 2: Production Environment
 # ==========================================
 # Start fresh from a lightweight image to keep the final size tiny
-FROM node:20-alpine AS runner
+FROM node:21-alpine AS runner
 
 # Set environment to production
 ENV NODE_ENV=production
