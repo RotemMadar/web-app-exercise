@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "express": "^4.21.2",
+    "path-to-regexp": "^0.1.13",
     "prom-client": "^15.1.3"
   }
 }
