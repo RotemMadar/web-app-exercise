@@ -24,6 +24,8 @@ FROM node:20-alpine AS runner
 # Set environment to production
 ENV NODE_ENV=production
 
+ARG PORT=8083
+
 WORKDIR /app
 
 # Create a non-root user for security (Alpine Linux comes with a 'node' user)
@@ -39,7 +41,7 @@ COPY sample-nodejs-main/package.json ./
 COPY sample-nodejs-main/app.js ./
 
 # Expose the port your app listens on (matches the containerPort in your Helm chart)
-EXPOSE 8081
+EXPOSE $PORT
 
 # Define the command to start your application
 CMD ["node", "app.js"]
