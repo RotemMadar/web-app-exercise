@@ -24,7 +24,13 @@ pipeline {
 
         stage('Security Scan') {
             steps {
-                echo 'Scanning code for vulnerabilities...'
+                bat """
+                    trivy fs ^
+                      --scanners vuln,secret,misconfig ^
+                      --exit-code 1 ^
+                      --severity CRITICAL ^
+                      .
+                """
             }
         }
 
@@ -37,16 +43,17 @@ pipeline {
             }
         }
 
-        // stage('Security Scan (Trivy)') {
-        //     steps {
-        //         bat """
-        //             trivy image \
-        //               --exit-code 1 \
-        //               --severity HIGH,CRITICAL \
-        //               ${env.IMAGE_PATH}
-        //         """
-        //     }
-        // }
+        stage('Vulnerability Image Scanning (Trivy)') {
+            steps {
+                echo 'Scanning compiled Docker image...'
+                bat """
+                    trivy image ^
+                      --exit-code 1 ^
+                      --severity HIGH,CRITICAL ^
+                      ${env.IMAGE_PATH}
+                """
+            }
+        }
 
         stage('Upload Image to Artifactory') {
             steps {
